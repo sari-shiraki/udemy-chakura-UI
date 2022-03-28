@@ -3,9 +3,12 @@ import { useCallback, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { User } from "../types/api/user";
+import { useMessage } from "./useMessage";
 
 export const useAuth = () => {
   const history = useHistory();
+  const { showMessage } = useMessage();
+
   const [loading, setLoading] = useState(false);
 
   const login = useCallback(
@@ -17,14 +20,20 @@ export const useAuth = () => {
         .then((res) => {
           history.push("/home");
           if (res.data) {
+            showMessage({ title: "ログインしました", status: "success" });
           } else {
-            alert("ユーザーが見つかりません");
+            showMessage({ title: "ユーザーが見つかりません", status: "error" });
           }
         })
-        .catch(() => alert("ログインできません"))
+        .catch(() =>
+          showMessage({
+            title: "ログインできません",
+            status: "error"
+          })
+        )
         .finally(() => setLoading(false));
     },
-    [history]
+    [history, showMessage]
   );
   return { login, loading };
 };
